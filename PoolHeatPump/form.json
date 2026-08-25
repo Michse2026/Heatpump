@@ -1,1 +1,71 @@
-
+{
+  "elements": [
+    {
+      "type": "Label",
+      "caption": "Inoffizielle Cloud-Anbindung für Fairland-iGarden-Wärmepumpen, u. a. Pool-Systems IPS-270MAX. Empfehlung: separates, freigegebenes iGarden-Konto verwenden."
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "Username",
+      "caption": "iGarden-Konto (E-Mail oder Telefonnummer)"
+    },
+    {
+      "type": "PasswordTextBox",
+      "name": "Password",
+      "caption": "Passwort"
+    },
+    {
+      "type": "Select",
+      "name": "Region",
+      "caption": "Cloud-Region",
+      "options": [
+        {"caption": "Automatisch erkennen", "value": "auto"},
+        {"caption": "Europa", "value": "eu"},
+        {"caption": "USA", "value": "us"},
+        {"caption": "China", "value": "cn"},
+        {"caption": "Hongkong", "value": "hk"}
+      ]
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "CountryCode",
+      "caption": "Ländercode",
+      "validate": "^([A-Z]{2})$"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "PhoneCode",
+      "caption": "Telefonvorwahl ohne +",
+      "validate": "^[0-9]{1,4}$"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "DeviceID",
+      "caption": "Geräte-ID (leer = erste Wärmepumpe automatisch wählen)"
+    },
+    {
+      "type": "NumberSpinner",
+      "name": "Interval",
+      "caption": "Aktualisierungsintervall (Sekunden)",
+      "minimum": 15,
+      "maximum": 3600
+    },
+    {
+      "type": "CheckBox",
+      "name": "CreateRawVariables",
+      "caption": "Alle zusätzlichen Cloud-Datenpunkte als Variablen anlegen"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Button",
+      "caption": "Verbindung testen und Gerät suchen",
+      "onClick": "IGDN_Discover($id);"
+    },
+    {
+      "type": "Button",
+      "caption": "Daten jetzt aktualisieren",
+      "onClick": "IGDN_Update($id);"
+    }
+  ]
+}

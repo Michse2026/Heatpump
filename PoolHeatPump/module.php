@@ -548,7 +548,7 @@ class PoolHeatPump extends IPSModule
         }
     }
 
-    private function setValue(string $ident, $value): void
+    private function setModuleValue(string $ident, $value): void
     {
         $id = @$this->GetIDForIdent($ident);
         if ($id > 0 && GetValue($id) !== $value) {

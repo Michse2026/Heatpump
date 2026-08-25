@@ -1,15 +1,14 @@
 {
-  "id": "{95A16FA3-2F33-47F7-A78C-26D5D047413C}",
-  "name": "iGardenHeatPump",
+  "id": "{42FA3D38-378C-4C88-9343-7DE8B78E8A96}",
+  "name": "Pool Heat Pump",
   "type": 3,
-  "vendor": "Fairland / iGarden",
-  "url": "",
+  "vendor": "Pool-Systems",
   "aliases": [
-    "iGarden Wärmepumpe",
-    "Pool-Systems IPS-270MAX"
+    "iGarden Heat Pump",
+    "IPS-270MAX"
   ],
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
-  "prefix": "IGDN"
+  "prefix": "PSHP"
 }

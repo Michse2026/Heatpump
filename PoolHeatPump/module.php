@@ -374,36 +374,100 @@ class PoolHeatPump extends IPSModule
     {
         $scales = [];
         $powerKW = null;
+
         foreach ($dps as $dp) {
             if (!is_array($dp) || !isset($dp['dpId'])) {
                 continue;
             }
+
             $id = (string) $dp['dpId'];
             $property = $this->parseProperty($dp['dpProperty'] ?? null);
             $scale = max(0, (int) ($property['scale'] ?? 0));
             $scales[$id] = $scale;
+
             $raw = $dp['dpValue'] ?? null;
             $value = $this->scaleForRead($raw, $scale);
 
             switch ($id) {
-                case '101': $this->setValue('Power', $this->toBool($raw)); break;
-                case '102': $this->setValue('PerformanceMode', (int) $raw); $this->updatePerformanceProfile($property); break;
-                case '103': $this->setValue('CurrentTemperature', (float) $value); break;
-                case '106': $this->setValue('OperatingMode', (int) $raw); break;
-                case '107': $this->setValue('TargetTemperature', (float) $value); break;
-                case '113': $this->setValue('Running', (int) $raw === 1); break;
+                case '101':
+                    $this->setValue('Power', $this->toBool($raw));
+                    break;
+
+                case '102':
+                    $this->setValue('PerformanceMode', (int) $raw);
+                    $this->updatePerformanceProfile($property);
+                    break;
+
+                case '103':
+                    $this->setValue('CurrentTemperature', (float) $value);
+                    break;
+
+                case '106':
+                    $this->setValue('OperatingMode', (int) $raw);
+                    break;
+
+                case '107':
+                    $this->setValue('TargetTemperature', (float) $value);
+                    break;
+
+                case '112':
+                    // Leistungsaufnahme wird von der Cloud in kW geliefert.
+                    $powerKW = (float) $value;
+                    break;
+
+                case '113':
+                    $this->setValue('Running', (int) $raw === 1);
+                    break;
             }
 
-            $name = (string) ($dp['dpName'] ?? $dp['name'] ?? ('Datenpunkt ' . $id));
-            $unit = (string) ($property['unit'] ?? $dp['unit'] ?? '');
-            if ($this->isPowerPoint($name, $unit, $value)) {
-                $powerKW = $this->normalizePowerToKW((float) $value, $unit);
+            $name = (string) (
+                $dp['dpName']
+                ?? $dp['name']
+                ?? ('Datenpunkt ' . $id)
+            );
+
+            $unit = (string) (
+                $property['unit']
+                ?? $dp['unit']
+                ?? ''
+            );
+
+            // Fallback für andere Gerätevarianten, bei denen die Leistung
+            // möglicherweise eine andere Datenpunkt-ID besitzt.
+            if (
+                $id !== '112'
+                && $this->isPowerPoint($name, $unit, $value)
+            ) {
+                $powerKW = $this->normalizePowerToKW(
+                    (float) $value,
+                    $unit
+                );
             }
-            if ($this->ReadPropertyBoolean('CreateRawVariables') && !in_array($id, ['101', '102', '103', '106', '107', '113'], true)) {
-                $this->updateDynamicVariable($id, $name, $value, $unit);
+
+            // Bereits fest zugeordnete Datenpunkte nicht zusätzlich
+            // als generische Rohdatenvariablen anlegen.
+            if (
+                $this->ReadPropertyBoolean('CreateRawVariables')
+                && !in_array(
+                    $id,
+                    ['101', '102', '103', '106', '107', '112', '113'],
+                    true
+                )
+            ) {
+                $this->updateDynamicVariable(
+                    $id,
+                    $name,
+                    $value,
+                    $unit
+                );
             }
         }
-        $this->WriteAttributeString('ScaleMap', json_encode($scales));
+
+        $this->WriteAttributeString(
+            'ScaleMap',
+            json_encode($scales)
+        );
+
         if ($powerKW !== null) {
             $this->setValue('CurrentPower', $powerKW);
             $this->integrateEnergy($powerKW);

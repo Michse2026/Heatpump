@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class iGardenHeatPump extends IPSModule
+class PoolHeatPump extends IPSModule
 {
     private const REGIONS = [
         'eu' => 'https://api-eu.fairlandiot.com',
